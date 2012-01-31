@@ -8,12 +8,15 @@ makefile = $(lastword $(MAKEFILE_LIST))
 all build: jquery.paginator.auto.min.js jquery.paginator.coffee
 	@## Create minified production, and coffee, files
 
-%.min.js: src/%.js
+src/%.min.js: src/%.js
 	uglifyjs $< > $@
 
-src/jquery.paginator.auto.js: lib/jquery.ba-hashchange.js src/jquery.paginator.js
-	cat lib/jquery.ba-hashchange.js LF LF src/jquery.paginator.js | \
-		sed '/^[/][/]/d' > src/jquery.paginator.auto.js
+lib/%.min.js: lib/%.js
+	sed '/^[/][/]/d' $< | uglifyjs > $@
+
+jquery.paginator.auto.min.js: lib/jquery.ba-hashchange.min.js src/jquery.paginator.min.js
+	cat lib/jquery.ba-hashchange.min.js LF LF src/jquery.paginator.min.js \
+		> jquery.paginator.auto.min.js
 
 jquery.paginator.coffee: src/jquery.paginator.js
 	cat $< | js2coffee > $@
@@ -33,7 +36,8 @@ commit: check
 .PHONY: clean
 clean:
 	## Clean result and intermediate files
-	-rm src/jquery.paginator.auto.js
+	-rm lib/jquery.ba-hashchange.min.js
+	-rm src/jquery.paginator.min.js
 	-rm jquery.paginator.auto.min.js
 	-rm jquery.paginator.coffee
 
